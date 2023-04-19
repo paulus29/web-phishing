@@ -14,7 +14,11 @@ import favicon
 import re
 from urllib.parse import urlparse
 
-API = 'o44ww8kc840c0oogk008kw4skgkgokcc0woc8swo'
+API = '4o4800co08ock08ccw444okcggc8kok04w4sogks'
+# API = 'o88cswc0g0w084gw84cscog8so8ck8sckkck4g4o'
+# API = 'o44ww8kc840c0oogk008kw4skgkgokcc0woc8swo'
+# API = 'gs8sgc8gkcswoo4scss404w84w4wo8so0gg8ksko'
+# API = 'sg884ok0s4kgcosk00cggs48k0c4kw0ok0w4sg88'
 
 def having_ip_address(url):
     match = re.search(
