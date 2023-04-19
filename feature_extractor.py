@@ -14,11 +14,16 @@ import favicon
 import re
 from urllib.parse import urlparse
 
-API = '4o4800co08ock08ccw444okcggc8kok04w4sogks'
-# API = 'o88cswc0g0w084gw84cscog8so8ck8sckkck4g4o'
-# API = 'o44ww8kc840c0oogk008kw4skgkgokcc0woc8swo'
-# API = 'gs8sgc8gkcswoo4scss404w84w4wo8so0gg8ksko'
-# API = 'sg884ok0s4kgcosk00cggs48k0c4kw0ok0w4sg88'
+API = '4o4800co08ock08ccw444okcggc8kok04w4sogks' # 1
+# API = 'o88cswc0g0w084gw84cscog8so8ck8sckkck4g4o' # 2
+# API = 'o44ww8kc840c0oogk008kw4skgkgokcc0woc8swo' # 3
+# API = 'gs8sgc8gkcswoo4scss404w84w4wo8so0gg8ksko' # 4
+# API = 'sg884ok0s4kgcosk00cggs48k0c4kw0ok0w4sg88' # 5
+# API = 'w8ocwswwcc4sgwcggo4ggk08kgw0s80g4448gskk' # 6
+# API = 'sgk4swg0w8ggko4gkgckw0k40808wo0gs8cs088k' # 7
+# API = 'wgowgk4s4o8s08kg0go0ckgg8ss0cgcc4ws8444c' # 8
+# API = '8ggo0480g88w4s44os4ggw4goc8wc44k80g4co04' # 9
+# API = 'o0ow8wcg8w848o4wgwwcgcwscoskgkksoc4sk0ck' # 10
 
 def having_ip_address(url):
     match = re.search(
