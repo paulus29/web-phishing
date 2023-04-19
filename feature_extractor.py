@@ -1,53 +1,44 @@
-import pandas as pd 
-import urllib.parse
-import tldextract
 import requests
-import json
-import csv
-import os
 import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-import regex
 from tldextract import extract
 import ssl
 import socket
 from bs4 import BeautifulSoup
-import urllib.request
 import whois
 from datetime import datetime
 import time
 import requests
 import favicon
 import re
-import OpenSSL
-from dateutil.relativedelta import relativedelta
-from googlesearch import search
 from urllib.parse import urlparse
-
-import signal
-from contextlib import contextmanager
 
 API = 'o44ww8kc840c0oogk008kw4skgkgokcc0woc8swo'
 
+def having_ip_address(url):
+    match = re.search(
+        '(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.'
+        '([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\/)|'  # IPv4
+        '((0x[0-9a-fA-F]{1,2})\\.(0x[0-9a-fA-F]{1,2})\\.(0x[0-9a-fA-F]{1,2})\\.(0x[0-9a-fA-F]{1,2})\\/)|'  # IPv4 in hexadecimal
+        '(?:[a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}|'
+        '[0-9a-fA-F]{7}', url)  # Ipv6
+    if match:
+        return 1
+    else:
+        return 0
+    
 def count_dot(url):
     num_dots = url.count('.')
-    if num_dots >= 4:
-        return 1
-    else:
-        return 0
+    return num_dots
 
 def has_special_symbol(url):
-    if "@" in url or "-" in url:
-        return 1
-    else:
-        return 0
+    num_at = url.count('@')
+    num_dash = url.count('-')
+    return num_at + num_dash
 
-def length_of_url(url):
-    if len(url) >= 74:
-        return 1
-    else:
-        return 0
+def url_length(url):
+    return len(url) 
     
 def has_suspicious_word(url):
     suspicious_keywords = ["security", "login", "signin", "bank", "account", "update", "include", "webs", "online"]
@@ -172,19 +163,17 @@ def hyperlink_features(url, soup):
         return total_links, no_hyperlink, 0.0, 0.0
     foreign_ratio = foreign_links / total_links
     empty_ratio = empty_links / total_links
-    error_ratio = error_links / total_links
-    redirection_ratio = redirection_links / total_links
-    
-    foreign_ration_feature = 1 if foreign_ratio > 0.5 else 0
-    
-    empty_ratio_feature = 1 if empty_ratio > 0.34 else 0
-    error_ratio_feature = 1 if error_ratio > 0.3 else 0
-    redirection_ratio_feature = 1 if redirection_ratio > 0.3 else 0
+    # error_ratio = error_links / total_links
+    # redirection_ratio = redirection_links / total_links
+    # foreign_ration_feature = 1 if foreign_ratio > 0.5 else 0
+    # empty_ratio_feature = 1 if empty_ratio > 0.34 else 0
+    # error_ratio_feature = 1 if error_ratio > 0.3 else 0
+    # redirection_ratio_feature = 1 if redirection_ratio > 0.3 else 0
     # print('foreign_ration_feature', foreign_ratio)
     # print('empty_ratio_feature', empty_ratio)
     # print('error_ratio_feature', error_ratio)
     # print('redirection_ratio_feature', redirection_ratio)
-    return total_links, no_hyperlink, foreign_ration_feature, empty_ratio_feature
+    return total_links, no_hyperlink, foreign_ratio, empty_ratio
 
 def check_external_css_foreign_domain(url, soup):
     # print('check_external_css_foreign_domain')
@@ -308,7 +297,6 @@ def age_of_domain(whois_res):
         return 0
     
 def get_pagerank(url):
-#     print('get_pagerank')
     extract_res = extract(url)
     url_ref = extract_res.domain + "." + extract_res.suffix
     headers = {'API-OPR': API}
@@ -316,9 +304,8 @@ def get_pagerank(url):
     req_url = 'https://openpagerank.com/api/v1.0/getPageRank?domains%5B0%5D=' + domain
     request = requests.get(req_url, headers=headers)
     result = request.json()
-#     print(result)
-    value = result['response'][0]['page_rank_decimal']
-    return value
+    page_rank = result['response'][0]['page_rank_decimal']
+    return page_rank
 
 def extract_features(url):
     features = []
@@ -336,9 +323,11 @@ def extract_features(url):
             soup = BeautifulSoup(page.content, 'html.parser', from_encoding='iso-8859-1')
             _, domain, suffix = extract(url)
             whois_response = whois.whois(f'{domain}.{suffix}')
+            features.append(url)
+            features.append(having_ip_address(url))
             features.append(count_dot(url))
             features.append(has_special_symbol(url))
-            features.append(length_of_url(url))
+            features.append(url_length(url))
             features.append(has_suspicious_word(url))
             features.append(count_tld(url))
             features.append(HTTPS_token(url))
@@ -356,13 +345,14 @@ def extract_features(url):
             features.append(get_pagerank(url))
             return features
         except Exception as e:
-            print(e)
             return None
     return None
 
 nama_column =[
+    'url',
+    'ip_address',
     'count_dot',
-    'has_special_symbol',
+    'special_symbol',
     'length_of_url',
     'has_suspicious_word',
     'count_tld',
@@ -374,12 +364,12 @@ nama_column =[
     'no_hyperlinks',
     'foreign_ratio_links',
     'empty_ratio_links',
-    'check_external_css',
-    'find_copyright',
+    'external_css',
+    'copyright',
     'identity_keywords',
-    'check_favicon', 
+    'favicon', 
     'SSLfinal_State',
     'domain_registration_length',
     'age_of_domain',
-    'get_pagerank'
+    'page_rank'
 ]
