@@ -585,7 +585,10 @@ def extract_features(url):
         url = f"http://{url}"
     try:
         page = requests.get(url, timeout=5)
-        status = True
+        if page and page.status_code == 200 and page.content not in ["b''", "b' '"]:
+            status = True
+        else:
+            status = False
     except:
         status = False
     
