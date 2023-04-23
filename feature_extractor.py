@@ -318,7 +318,7 @@ def extract_content(url, soup):
                 else:
                     Link['internals'].append(hostname+script['src'])   
         else:
-            Link['externals'].append(link['href'])
+            Link['externals'].append(script['src'])
 
         # collect all css
     for link in soup.find_all('link', rel='stylesheet'):
