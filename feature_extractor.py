@@ -15,6 +15,7 @@ import favicon
 import re
 from urllib.parse import urlparse
 import ipaddress
+import numpy as np
 
 API = '4o4800co08ock08ccw444okcggc8kok04w4sogks' # 1
 # API = 'o88cswc0g0w084gw84cscog8so8ck8sckkck4g4o' # 2
@@ -472,28 +473,70 @@ def find_copyright(url, soup):
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+# def identity_keywords(url, soup):
+#     # print('identity_keywords')
+#     try:
+#         meta = soup.find_all('meta')
+#         meta_keywords = [m.attrs.get("content") for m in meta if m.attrs.get("name") == "keywords"]
+#         vectorizer = TfidfVectorizer(stop_words='english')
+#         if soup.title != None:
+#             title = soup.title.string
+#             text = [title] + meta_keywords
+#         else:
+#             text = meta_keywords
+#         if len(text) == 0:
+#             return 1
+#         tfidf = vectorizer.fit_transform(text)
+#         top_keywords = [vectorizer.get_feature_names_out()[i] for i in tfidf[0].indices[:5]]
+#         identity_keywords = set(meta_keywords + top_keywords)
+#         _, domain, suffix = extract(url)
+#         if any(keyword in domain for keyword in identity_keywords):
+#             return 0
+#         else:
+#             return 1
+#     except:
+#         return 1
+
 def identity_keywords(url, soup):
-    # print('identity_keywords')
+    def get_tfidf_top_features(documents,n_top=10):
+        tfidf_vectorizer = TfidfVectorizer(stop_words='english')
+        tfidf = tfidf_vectorizer.fit_transform(documents)
+        importance = np.argsort(np.asarray(tfidf.sum(axis=0)).ravel())[::-1]
+        tfidf_feature_names = np.array(tfidf_vectorizer.get_feature_names_out())
+        return list(tfidf_feature_names[importance[:n_top]])
+
     try:
         meta = soup.find_all('meta')
-        meta_keywords = [m.attrs.get("content") for m in meta if m.attrs.get("name") == "keywords"]
-        vectorizer = TfidfVectorizer(stop_words='english')
+        meta_keywords = [m.attrs.get("content") for m in meta if m.attrs.get("name") in ['description', 'title', 'keyword']]
+        text = []
+        top_keywords = []
         if soup.title != None:
             title = soup.title.string
             text = [title] + meta_keywords
         else:
             text = meta_keywords
-        if len(text) == 0:
-            return 1
-        tfidf = vectorizer.fit_transform(text)
-        top_keywords = [vectorizer.get_feature_names_out()[i] for i in tfidf[0].indices[:5]]
-        identity_keywords = set(meta_keywords + top_keywords)
+
+        all_website_text = []
+        all_tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+        for tag in all_tags:
+            for paragraph in soup.find_all(tag):
+                all_website_text.append(paragraph.get_text())
+        
+        if all_website_text:
+            top_keywords = get_tfidf_top_features(all_website_text, 10)
+
+        if text:
+            tfidf_vectorizer = TfidfVectorizer(stop_words='english')
+            tfidf = tfidf_vectorizer.fit_transform(text)
+            text = list(tfidf_vectorizer.get_feature_names_out())
+
+        identity_keywords = set(text + top_keywords)
         _, domain, suffix = extract(url)
         if any(keyword in domain for keyword in identity_keywords):
             return 0
         else:
             return 1
-    except:
+    except Exception as e:
         return 1
     
 # def check_favicon(url):
@@ -615,7 +658,7 @@ def extract_features(url):
             features.append(nb_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
             features.append(internal_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
             features.append(external_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
-            features.append(null_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
+            # features.append(null_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
             features.append(external_css(CSS))
             features.append(links_in_tags(Link))
             features.append(safe_anchor(Anchor))
@@ -651,10 +694,10 @@ nama_column =[
     'nb_hyperlinks',
     'internal_hyperlinks',
     'external_hyperlinks',
-    'null_hyperlinks',
+    # 'null_hyperlinks',
+    'external_css',
     'links_in_tags',
     'safe_anchor',
-    'external_css',
     'copyright',
     'identity_keywords',
     'favicon', 
@@ -663,3 +706,5 @@ nama_column =[
     'age_of_domain',
     'page_rank'
 ]
+
+# print(extract_features('https://bitdefender.com'))
