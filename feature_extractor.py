@@ -65,7 +65,7 @@ def url_length(url):
     return len(url) 
     
 def has_suspicious_word(url):
-    suspicious_keywords = ["security", "login", "signin", "bank", "account", "update", "include", "webs", "online"]
+    suspicious_keywords = ["security", "login", "signin", "bank", "account", "update", "include", "w 1ebs", "online"]
     for keyword in suspicious_keywords:
         if keyword in url.lower():
             return 1
@@ -225,115 +225,139 @@ def extract_content(url, soup):
 
     # collect all external and internal hrefs from url
     for href in soup.find_all('a', href=True):
-        dots = [x.start(0) for x in re.finditer('\.', href['href'])]
-        if hostname in href['href'] or domain in href['href'] or len(dots) == 1 or not href['href'].startswith('http'):
-            if "#" in href['href'] or "javascript" in href['href'].lower() or "mailto" in href['href'].lower():
-                Anchor['unsafe'].append(href['href']) 
-            if not href['href'].startswith('http'):
-                if not href['href'].startswith('/'):
-                    Href['internals'].append(hostname+'/'+href['href']) 
-                elif href['href'] in Null_format:
-                    Href['null'].append(href['href'])  
-                else:
-                    Href['internals'].append(hostname+href['href'])   
-        else:
-            Href['externals'].append(href['href'])
-            Anchor['safe'].append(href['href'])
+        try:
+            dots = [x.start(0) for x in re.finditer('\.', href['href'])]
+            if hostname in href['href'] or domain in href['href'] or len(dots) == 1 or not href['href'].startswith('http'):
+                if "#" in href['href'] or "javascript" in href['href'].lower() or "mailto" in href['href'].lower():
+                    Anchor['unsafe'].append(href['href']) 
+                if not href['href'].startswith('http'):
+                    if not href['href'].startswith('/'):
+                        Href['internals'].append(hostname+'/'+href['href']) 
+                    elif href['href'] in Null_format:
+                        Href['null'].append(href['href'])  
+                    else:
+                        Href['internals'].append(hostname+href['href'])   
+            else:
+                Href['externals'].append(href['href'])
+                Anchor['safe'].append(href['href'])
+        except:
+            continue
 
     # collect all media src tags
     for img in soup.find_all('img', src=True):
-        dots = [x.start(0) for x in re.finditer('\.', img['src'])]
-        if hostname in img['src'] or domain in img['src'] or len(dots) == 1 or not img['src'].startswith('http'):
-            if not img['src'].startswith('http'):
-                if not img['src'].startswith('/'):
-                    Media['internals'].append(hostname+'/'+img['src']) 
-                elif img['src'] in Null_format:
-                    Media['null'].append(img['src'])  
-                else:
-                    Media['internals'].append(hostname+img['src'])   
-        else:
-            Media['externals'].append(img['src'])
-           
+        try:
+            dots = [x.start(0) for x in re.finditer('\.', img['src'])]
+            if hostname in img['src'] or domain in img['src'] or len(dots) == 1 or not img['src'].startswith('http'):
+                if not img['src'].startswith('http'):
+                    if not img['src'].startswith('/'):
+                        Media['internals'].append(hostname+'/'+img['src']) 
+                    elif img['src'] in Null_format:
+                        Media['null'].append(img['src'])  
+                    else:
+                        Media['internals'].append(hostname+img['src'])   
+            else:
+                Media['externals'].append(img['src'])
+        except:
+            continue
     
     for audio in soup.find_all('audio', src=True):
-        dots = [x.start(0) for x in re.finditer('\.', audio['src'])]
-        if hostname in audio['src'] or domain in audio['src'] or len(dots) == 1 or not audio['src'].startswith('http'):
-             if not audio['src'].startswith('http'):
-                if not audio['src'].startswith('/'):
-                    Media['internals'].append(hostname+'/'+audio['src']) 
-                elif audio['src'] in Null_format:
-                    Media['null'].append(audio['src'])  
-                else:
-                    Media['internals'].append(hostname+audio['src'])   
-        else:
-            Media['externals'].append(audio['src'])
+        try:
+            dots = [x.start(0) for x in re.finditer('\.', audio['src'])]
+            if hostname in audio['src'] or domain in audio['src'] or len(dots) == 1 or not audio['src'].startswith('http'):
+                if not audio['src'].startswith('http'):
+                    if not audio['src'].startswith('/'):
+                        Media['internals'].append(hostname+'/'+audio['src']) 
+                    elif audio['src'] in Null_format:
+                        Media['null'].append(audio['src'])  
+                    else:
+                        Media['internals'].append(hostname+audio['src'])   
+            else:
+                Media['externals'].append(audio['src'])
+        except:
+            continue
             
     for embed in soup.find_all('embed', src=True):
-        dots = [x.start(0) for x in re.finditer('\.', embed['src'])]
-        if hostname in embed['src'] or domain in embed['src'] or len(dots) == 1 or not embed['src'].startswith('http'):
-            if not embed['src'].startswith('http'):
-                if not embed['src'].startswith('/'):
-                    Media['internals'].append(hostname+'/'+embed['src']) 
-                elif embed['src'] in Null_format:
-                    Media['null'].append(embed['src'])  
-                else:
-                    Media['internals'].append(hostname+embed['src'])   
-        else:
-            Media['externals'].append(embed['src'])
+        try:
+            dots = [x.start(0) for x in re.finditer('\.', embed['src'])]
+            if hostname in embed['src'] or domain in embed['src'] or len(dots) == 1 or not embed['src'].startswith('http'):
+                if not embed['src'].startswith('http'):
+                    if not embed['src'].startswith('/'):
+                        Media['internals'].append(hostname+'/'+embed['src']) 
+                    elif embed['src'] in Null_format:
+                        Media['null'].append(embed['src'])  
+                    else:
+                        Media['internals'].append(hostname+embed['src'])   
+            else:
+                Media['externals'].append(embed['src'])
+        except:
+            continue
 
     for i_frame in soup.find_all('iframe', src=True):
-        dots = [x.start(0) for x in re.finditer('\.', i_frame['src'])]
-        if hostname in i_frame['src'] or domain in i_frame['src'] or len(dots) == 1 or not i_frame['src'].startswith('http'):
-            if not i_frame['src'].startswith('http'):
-                if not i_frame['src'].startswith('/'):
-                    Media['internals'].append(hostname+'/'+i_frame['src']) 
-                elif i_frame['src'] in Null_format:
-                    Media['null'].append(i_frame['src'])  
-                else:
-                    Media['internals'].append(hostname+i_frame['src'])   
-        else: 
-            Media['externals'].append(i_frame['src'])
+        try:
+            dots = [x.start(0) for x in re.finditer('\.', i_frame['src'])]
+            if hostname in i_frame['src'] or domain in i_frame['src'] or len(dots) == 1 or not i_frame['src'].startswith('http'):
+                if not i_frame['src'].startswith('http'):
+                    if not i_frame['src'].startswith('/'):
+                        Media['internals'].append(hostname+'/'+i_frame['src']) 
+                    elif i_frame['src'] in Null_format:
+                        Media['null'].append(i_frame['src'])  
+                    else:
+                        Media['internals'].append(hostname+i_frame['src'])   
+            else: 
+                Media['externals'].append(i_frame['src'])
+        except:
+            continue
 
     # collect all link tags
     for link in soup.findAll('link', href=True):
-        dots = [x.start(0) for x in re.finditer('\.', link['href'])]
-        if hostname in link['href'] or domain in link['href'] or len(dots) == 1 or not link['href'].startswith('http'):
-            if not link['href'].startswith('http'):
-                if not link['href'].startswith('/'):
-                    Link['internals'].append(hostname+'/'+link['href']) 
-                elif link['href'] in Null_format:
-                    Link['null'].append(link['href'])  
-                else:
-                    Link['internals'].append(hostname+link['href'])   
-        else:
-            Link['externals'].append(link['href'])
+        try:
+            dots = [x.start(0) for x in re.finditer('\.', link['href'])]
+            if hostname in link['href'] or domain in link['href'] or len(dots) == 1 or not link['href'].startswith('http'):
+                if not link['href'].startswith('http'):
+                    if not link['href'].startswith('/'):
+                        Link['internals'].append(hostname+'/'+link['href']) 
+                    elif link['href'] in Null_format:
+                        Link['null'].append(link['href'])  
+                    else:
+                        Link['internals'].append(hostname+link['href'])   
+            else:
+                Link['externals'].append(link['href'])
+        except:
+            continue
 
     for script in soup.find_all('script', src=True):
-        dots = [x.start(0) for x in re.finditer('\.', script['src'])]
-        if hostname in script['src'] or domain in script['src'] or len(dots) == 1 or not script['src'].startswith('http'):
-            if not script['src'].startswith('http'):
-                if not script['src'].startswith('/'):
-                    Link['internals'].append(hostname+'/'+script['src']) 
-                elif script['src'] in Null_format:
-                    Link['null'].append(script['src'])  
-                else:
-                    Link['internals'].append(hostname+script['src'])   
-        else:
-            Link['externals'].append(script['src'])
+        try:
+            dots = [x.start(0) for x in re.finditer('\.', script['src'])]
+            if hostname in script['src'] or domain in script['src'] or len(dots) == 1 or not script['src'].startswith('http'):
+                if not script['src'].startswith('http'):
+                    if not script['src'].startswith('/'):
+                        Link['internals'].append(hostname+'/'+script['src']) 
+                    elif script['src'] in Null_format:
+                        Link['null'].append(script['src'])  
+                    else:
+                        Link['internals'].append(hostname+script['src'])   
+            else:
+                Link['externals'].append(script['src'])
+        except:
+            continue
 
         # collect all css
     for link in soup.find_all('link', rel='stylesheet'):
-        dots = [x.start(0) for x in re.finditer('\.', link['href'])]
-        if hostname in link['href'] or domain in link['href'] or len(dots) == 1 or not link['href'].startswith('http'):
-            if not link['href'].startswith('http'):
-                if not link['href'].startswith('/'):
-                    CSS['internals'].append(hostname+'/'+link['href']) 
-                elif link['href'] in Null_format:
-                    CSS['null'].append(link['href'])  
-                else:
-                    CSS['internals'].append(hostname+link['href'])   
-        else:
-            CSS['externals'].append(link['href'])
+        # Fixing bugs link tidak punya atribute href
+        try:
+            dots = [x.start(0) for x in re.finditer('\.', link['href'])]
+            if hostname in link['href'] or domain in link['href'] or len(dots) == 1 or not link['href'].startswith('http'):
+                if not link['href'].startswith('http'):
+                    if not link['href'].startswith('/'):
+                        CSS['internals'].append(hostname+'/'+link['href']) 
+                    elif link['href'] in Null_format:
+                        CSS['null'].append(link['href'])  
+                    else:
+                        CSS['internals'].append(hostname+link['href'])   
+            else:
+                CSS['externals'].append(link['href'])
+        except:
+            continue
     
     for style in soup.find_all('style', type='text/css'):
         try: 
@@ -356,44 +380,25 @@ def extract_content(url, soup):
 
     # collect all form actions
     for form in soup.findAll('form', action=True):
-        dots = [x.start(0) for x in re.finditer('\.', form['action'])]
-        if hostname in form['action'] or domain in form['action'] or len(dots) == 1 or not form['action'].startswith('http'):
-            if not form['action'].startswith('http'):
-                if not form['action'].startswith('/'):
-                    Form['internals'].append(hostname+'/'+form['action']) 
-                elif form['action'] in Null_format or form['action'] == 'about:blank':
-                    Form['null'].append(form['action'])  
-                else:
-                    Form['internals'].append(hostname+form['action'])   
-        else:
-            Form['externals'].append(form['action'])
+        try:
+            dots = [x.start(0) for x in re.finditer('\.', form['action'])]
+            if hostname in form['action'] or domain in form['action'] or len(dots) == 1 or not form['action'].startswith('http'):
+                if not form['action'].startswith('http'):
+                    if not form['action'].startswith('/'):
+                        Form['internals'].append(hostname+'/'+form['action']) 
+                    elif form['action'] in Null_format or form['action'] == 'about:blank':
+                        Form['null'].append(form['action'])  
+                    else:
+                        Form['internals'].append(hostname+form['action'])   
+            else:
+                Form['externals'].append(form['action'])
+        except:
+            continue
             
     # collect all link tags
     for head in soup.find_all('head'):
         for head.link in soup.find_all('link', href=True):
-            dots = [x.start(0) for x in re.finditer('\.', head.link['href'])]
-            if hostname in head.link['href'] or len(dots) == 1 or domain in head.link['href'] or not head.link['href'].startswith('http'):
-                if not head.link['href'].startswith('http'):
-                    if not head.link['href'].startswith('/'):
-                        Favicon['internals'].append(hostname+'/'+head.link['href']) 
-                    elif head.link['href'] in Null_format:
-                        Favicon['null'].append(head.link['href'])  
-                    else:
-                        Favicon['internals'].append(hostname+head.link['href'])   
-            else:
-                Favicon['externals'].append(head.link['href'])
-                
-        for head.link in soup.findAll('link', {'href': True, 'rel':True}):
-            isicon = False
-            if isinstance(head.link['rel'], list):
-                for e_rel in head.link['rel']:
-                    if (e_rel.endswith('icon')):
-                        isicon = True
-            else:
-                if (head.link['rel'].endswith('icon')):
-                    isicon = True
-                    
-            if isicon:
+            try:
                 dots = [x.start(0) for x in re.finditer('\.', head.link['href'])]
                 if hostname in head.link['href'] or len(dots) == 1 or domain in head.link['href'] or not head.link['href'].startswith('http'):
                     if not head.link['href'].startswith('http'):
@@ -405,6 +410,34 @@ def extract_content(url, soup):
                             Favicon['internals'].append(hostname+head.link['href'])   
                 else:
                     Favicon['externals'].append(head.link['href'])
+            except:
+                continue
+                
+        for head.link in soup.findAll('link', {'href': True, 'rel':True}):
+            try:
+                isicon = False
+                if isinstance(head.link['rel'], list):
+                    for e_rel in head.link['rel']:
+                        if (e_rel.endswith('icon')):
+                            isicon = True
+                else:
+                    if (head.link['rel'].endswith('icon')):
+                        isicon = True
+                        
+                if isicon:
+                    dots = [x.start(0) for x in re.finditer('\.', head.link['href'])]
+                    if hostname in head.link['href'] or len(dots) == 1 or domain in head.link['href'] or not head.link['href'].startswith('http'):
+                        if not head.link['href'].startswith('http'):
+                            if not head.link['href'].startswith('/'):
+                                Favicon['internals'].append(hostname+'/'+head.link['href']) 
+                            elif head.link['href'] in Null_format:
+                                Favicon['null'].append(head.link['href'])  
+                            else:
+                                Favicon['internals'].append(hostname+head.link['href'])   
+                    else:
+                        Favicon['externals'].append(head.link['href'])
+            except:
+                continue
     return Href, Link, Anchor, Media, Form, CSS, Favicon
 
 def nb_hyperlinks(Href, Link, Media, Form, CSS, Favicon):
@@ -441,7 +474,7 @@ def external_css(CSS):
     return len(CSS['externals'])
 
 def links_in_tags(Link):
-    total = len(Link['internals']) +  len(Link['externals'])
+    total = len(Link['internals']) + len(Link['externals'])
     internals = len(Link['internals'])
     try:
         percentile = internals / float(total) * 100
@@ -590,7 +623,7 @@ def SSLfinal_State(page_response):
 
 def domain_registration_length(whois_res):
     try:
-        expiration_date = whois_res.expiration_date  if not isinstance(whois_res.expiration_date, list) else whois_res.expiration_date[0]
+        expiration_date = whois_res.expiration_date if not isinstance(whois_res.expiration_date, list) else whois_res.expiration_date[0]
         today = time.strftime('%Y-%m-%d')
         today = datetime.strptime(today, '%Y-%m-%d')
         if expiration_date:
@@ -627,55 +660,52 @@ def extract_features(url):
     if not url.startswith('http'):
         url = f"http://{url}"
     try:
-        page = requests.get(url, timeout=5)
+        page = requests.get(url, timeout=5, headers = {"User-Agent": "Mozilla/5.0 (X11; CrOS x86_64 12871.102.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"})
         if page and page.status_code == 200 and page.content not in ["b''", "b' '"]:
             status = True
         else:
             status = False
     except:
         status = False
-    
     if status:
-        try:
-            url = page.url
-            soup = BeautifulSoup(page.content, 'html.parser', from_encoding='iso-8859-1')
-            _, domain, suffix = extract(url)
-            whois_response = whois.whois(f'{domain}.{suffix}')
-            Href, Link, Anchor, Media, Form, CSS, Favicon= extract_content(url, soup)
-            features.append(url)
-            features.append(having_ip_address(url))
-            features.append(prefix_suffix(url))
-            features.append(double_slash(url))
-            features.append(count_dot(url))
-            features.append(has_special_symbol(url))
-            features.append(url_length(url))
-            features.append(has_suspicious_word(url))
-            features.append(count_tld(url))
-            features.append(HTTPS_token(url))
-            features.append(incorrect_brand_position(url))
-            features.append(check_data_uri(soup))
-            features.append(fake_login_form(url, soup))
-            features.append(nb_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
-            features.append(internal_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
-            features.append(external_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
-            # features.append(null_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
-            features.append(external_css(CSS))
-            features.append(links_in_tags(Link))
-            features.append(safe_anchor(Anchor))
-            # features.extend(hyperlink_features(url, soup))
-            # features.append(check_external_css_foreign_domain(url, soup))
-            features.append(find_copyright(url, soup))
-            features.append(identity_keywords(url, soup))
-            features.append(external_favicon(Favicon))
-            # features.append(check_favicon(url))
-            features.append(SSLfinal_State(page))
-            features.append(domain_registration_length(whois_response))
-            features.append(age_of_domain(whois_response))
-            features.append(get_pagerank(url))
-            return features
-        except Exception as e:
-            return None
-    return None
+        url = page.url
+        soup = BeautifulSoup(page.content, 'html.parser', from_encoding='iso-8859-1')
+        _, domain, suffix = extract(url)
+        whois_response = whois.whois(f'{domain}.{suffix}')
+        Href, Link, Anchor, Media, Form, CSS, Favicon= extract_content(url, soup)
+        features.append(url)
+        features.append(having_ip_address(url))
+        features.append(prefix_suffix(url))
+        features.append(double_slash(url))
+        features.append(count_dot(url))
+        features.append(has_special_symbol(url))
+        features.append(url_length(url))
+        features.append(has_suspicious_word(url))
+        features.append(count_tld(url))
+        features.append(HTTPS_token(url))
+        features.append(incorrect_brand_position(url))
+        features.append(check_data_uri(soup))
+        features.append(fake_login_form(url, soup))
+        features.append(nb_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
+        features.append(internal_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
+        features.append(external_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
+        # features.append(null_hyperlinks(Href, Link, Media, Form, CSS, Favicon))
+        features.append(external_css(CSS))
+        features.append(links_in_tags(Link))
+        features.append(safe_anchor(Anchor))
+        # features.extend(hyperlink_features(url, soup))
+        # features.append(check_external_css_foreign_domain(url, soup))
+        features.append(find_copyright(url, soup))
+        features.append(identity_keywords(url, soup))
+        features.append(external_favicon(Favicon))
+        # features.append(check_favicon(url))
+
+        features.append(SSLfinal_State(page))
+        features.append(domain_registration_length(whois_response))
+        features.append(age_of_domain(whois_response))
+        features.append(get_pagerank(url))
+        return features
+    return False
 
 nama_column =[
     'url',
