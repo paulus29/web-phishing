@@ -29,6 +29,10 @@ hide_menu_style = """
         """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
+@st.cache_resource(show_spinner=False)
+def load_model():
+  return joblib.load('model/voting1.joblib')
+
 st.title("Phishing Website Detector")
 with st.container():
   link = st.text_input("Enter the URL you want to check", placeholder='Enter the URL you want to check. Example: http://google.com', label_visibility='hidden')
@@ -36,7 +40,7 @@ with st.container():
   if st.button('Check URL', use_container_width=True):
     if link:
       with st.spinner('Loading Model...'):
-        model = joblib.load('model/voting1.joblib')
+        model = load_model()
       try:
         with st.spinner("Please Wait. Extracting features..."):
           hasil = extract_features(link)
@@ -71,7 +75,7 @@ with st.container():
         else:
           st.warning("Sorry, our system failed to get information from the URL you entered. Please go to the help menu to get further explanation")
       except:
-        st.write("Opps, it looks like the app has encountered an error")
+        st.warning("Opps, it looks like the app has encountered an error")
     else:
-      st.write("Please enter the URL")
+      st.warning("Please enter the URL")
       
