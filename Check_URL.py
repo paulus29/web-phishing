@@ -51,11 +51,12 @@ with st.container():
             if model.predict(hasil)[0] == 1:
               st.success("The URL you entered is **safe**")
             else:
-              st.error(":grey_exclamation:**ALERT**:grey_exclamation:  The URL you entered is probably **phishing**")
+              st.error("**ALERT**:grey_exclamation:  The URL you entered is probably **phishing**")
               
           _, domain, suffix = extract(link)
           whois_response = whois.whois(f'{domain}.{suffix}')
-          tab1, tab2 = st.tabs(["Domain Info", "Features Extracted"])
+          
+          tab1, tab2 = st.tabs(["Domain Info", "Extracted Features"])
           with tab1:
             st.text(f'Domain Name            : {whois_response.domain_name}')
             st.text(f'Domain Registrar       : {whois_response.registrar}')
@@ -71,7 +72,12 @@ with st.container():
               st.text(f'Country                : None')
           
           with tab2:
-            st.write(hasil)
+            df = hasil.T
+            df = df.iloc[[24, 13, 25, 22, 14, 20, 6, 17, 23, 18, 2, 15, 4, 5, 11,
+                          12, 19, 10, 21, 16, 7, 8, 9, 3, 1]]
+            df.columns = ["Extracted Features"]
+            st.write('Below are the features that our system has extracted from the URL you entered. The features below are ranked by importance according to our machine learning model from very important to less important.')
+            st.dataframe(df, use_container_width=True)
         else:
           st.warning("Sorry, our system failed to get information from the URL you entered. Please go to the help menu to get further explanation")
       except:
