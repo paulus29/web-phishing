@@ -31,7 +31,7 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 @st.cache_resource(show_spinner=False)
 def load_model():
-  return joblib.load('model/voting1.joblib')
+  return joblib.load('model/voting2.joblib')
 
 st.title("Phishing Website Detector")
 with st.container():
