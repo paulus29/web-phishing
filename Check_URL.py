@@ -58,16 +58,47 @@ with st.container():
           
           tab1, tab2 = st.tabs(["Domain Info", "Extracted Features"])
           with tab1:
-            st.text(f'Domain Name            : {whois_response.domain_name}')
-            st.text(f'Domain Registrar       : {whois_response.registrar}')
-            st.text(f'Domain Creation Date   : {(whois_response.creation_date if not isinstance(whois_response.creation_date, list) else whois_response.creation_date[0]).strftime("%A, %d %B %Y")}')
-            st.text(f'Domain Expiration Date : {(whois_response.expiration_date if not isinstance(whois_response.expiration_date, list) else whois_response.expiration_date[0]).strftime("%A, %d %B %Y")}')
-            st.text(f'Organization           : {whois_response.org}')
-            st.text(f'Address                : {whois_response.address}')
-            st.text(f'City                   : {whois_response.city}')
-            country = pycountry.countries.get(alpha_2=str(whois_response.country))
-            if country:
-              st.text(f'Country                : {country.official_name}')
+            if whois_response.domain_name:
+              st.text(f'Domain Name            : {whois_response.domain_name}')
+            else:
+              st.text(f'Domain Name            : None')
+            
+            if whois_response.registrar:
+              st.text(f'Domain Registrar       : {whois_response.registrar}')
+            else:
+              st.text(f'Domain Registrar       : None')
+              
+            if whois_response.creation_date:
+              st.text(f'Domain Creation Date   : {(whois_response.creation_date if not isinstance(whois_response.creation_date, list) else whois_response.creation_date[0]).strftime("%A, %d %B %Y")}')
+            else:
+              st.text(f'Domain Creation Date   : None')
+            
+            if whois_response.expiration_date:
+              st.text(f'Domain Expiration Date : {(whois_response.expiration_date if not isinstance(whois_response.expiration_date, list) else whois_response.expiration_date[0]).strftime("%A, %d %B %Y")}')
+            else:
+              st.text(f'Domain Expiration Date : None')
+            
+            if whois_response.org:
+              st.text(f'Organization           : {whois_response.org}')
+            else:
+              st.text(f'Organization           : None')
+              
+            if whois_response.address:
+              st.text(f'Address                : {whois_response.address}')
+            else:
+              st.text(f'Address                : None')
+            
+            if whois_response.city:
+              st.text(f'City                   : {whois_response.city}')
+            else:
+              st.text(f'City                   : None')
+            
+            if whois_response.country:
+              country = pycountry.countries.get(alpha_2=str(whois_response.country))
+              if country:
+                st.text(f'Country                : {country.name}')
+              else:
+                st.text(f'Country                : None')
             else:
               st.text(f'Country                : None')
           
